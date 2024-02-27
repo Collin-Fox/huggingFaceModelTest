@@ -6,7 +6,7 @@ from transformers import T5Tokenizer, T5ForConditionalGeneration
 # set up tokenizer and model
 tokenizer = T5Tokenizer.from_pretrained('t5-large')
 model = T5ForConditionalGeneration.from_pretrained('t5-large', output_hidden_states=True)
-
+print("")
 def get_all_attributes(prompt):
     #Getting the prompt
     one_piece_sequence = (prompt)

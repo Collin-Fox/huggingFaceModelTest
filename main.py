@@ -20,6 +20,7 @@ prompt2 = ("At the first timestep t1, the previous hidden state h0 will be consi
 
 
 def get_cos_distance(last_state1, other_last_state):
+    print("")
     dot = torch.FloatTensor.dot(last_state1, other_last_state)
     norm_product = torch.FloatTensor.norm(last_state1) * torch.FloatTensor.norm(other_last_state)
     computed = 1.0 - (dot / norm_product)
