@@ -1,38 +1,44 @@
-import T5Translation as model
 import numpy as np
+import summarizationT5 as model2
+import torch
+
 '''
 get_encoding(promt to translate to german STRING) - returns encoder outputs as numpy array, inputs as tokens
 get_decode(inputs, encoder_outputs)
 
 '''
 
-f = open("venv/myfile.txt", "a")
+prompts = ("In the first time step t1, the previous hidden state h0 is considered zero or randomly selected. So the "
+           "first RNN cell updates the current hidden state with the first input and h0. Each level outputs two "
+           "things - the updated hidden state and the output for each level. The outputs at each level are rejected "
+           "and only the hidden states are passed to the next level.")
 
-prompts = ["Today is wednesday"]
-norms = []
-vectors = []
-x = 0
-for prompt in prompts:
-    encoderOUT, inputs = model.get_encoding(prompt)
-    prompt1Vec = model.get_vector(encoderOUT)
-    prompt1Norm = model.get_norm(prompt1Vec)
-    prompt1Attention = model.get_attention_vector(encoderOUT)
-    print("ENCODER VECTOR: \n")
-    print(prompt1Vec)
-    print("\nENCODER NORM: \n")
-    print(prompt1Norm)
-    print("\nATTENTION VECTOR: \n")
-    print(prompt1Attention)
-    print("\nATTENTION NORM: \n")
-    print(model.get_norm(prompt1Attention))
-    print(prompt1Vec.shape)
-    print(prompt1Attention.shape)
-    vectors.append(prompt1Vec)
-    norms.append(prompt1Norm)
-    outPrompt = model.get_decode(inputs, encoderOUT)
-    x = x + 1
+prompt2 = ("At the first timestep t1, the previous hidden state h0 will be considered as zero or randomly chosen. So "
+           "the first RNN cell will update the current hidden state with the first input and h0. Each layer outputs "
+           "two things — updated hidden state and the output for each stage. The outputs at each stage are rejected "
+           "and only the hidden states will be propagated to the next layer.")
 
-#prompt1Vec.tofile("venv/myfile.txt", format='%s')
-dot = np.matmul(vectors[0], vectors[1].transpose())
 
-print(dot)
+def get_cos_distance(last_state1, other_last_state):
+    dot = torch.FloatTensor.dot(last_state1, other_last_state)
+    norm_product = torch.FloatTensor.norm(last_state1) * torch.FloatTensor.norm(other_last_state)
+    computed = 1.0 - (dot / norm_product)
+    return computed
+
+
+last_state, attentions, summary = model2.get_all_attributes(prompts)
+
+print("PROMPT1: \n")
+print(last_state)
+print("\n")
+print(summary)
+
+last_state2, attentions2, summary2 = model2.get_all_attributes(prompt2)
+print("\nPROMPT2: \n")
+print(last_state2)
+print("\n")
+print(summary2)
+
+distance = get_cos_distance(last_state, last_state2)
+print("\nCOS DISTANCE: \n")
+print(distance)
